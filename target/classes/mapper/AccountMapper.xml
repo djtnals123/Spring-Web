@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sumin.spring.mapper.AccountMapper">
+	<select id="selectOne" parameterType="String" resultType="com.sumin.spring.dto.UserDto">
+		SELECT * FROM user WHERE id=#{id}
+	</select>
+	<insert id="insert" parameterType="com.sumin.spring.dto.UserDto">
+		INSERT INTO user(id, password, email, hospital, auth, name, enabled) 
+		VALUES( #{id} , #{password} , #{email}, #{hospital}, #{auth},  #{name} , 1 )
+	</insert>
+	
+	<select id="selectList" parameterType="com.sumin.spring.dto.Criteria" resultType="com.sumin.spring.dto.UserDto">
+		SELECT id, name, auth, hospital, email, created_date
+		FROM user
+		ORDER BY created_date DESC
+		LIMIT #{pageStart}, #{perPage}
+	</select>
+	
+	<update id="update" parameterType="com.sumin.spring.dto.UserDto">
+        UPDATE user
+        SET password = #{password}, 
+        	email = #{email},
+        	name = #{name},
+        	hospital = #{hospital},
+        	auth = #{auth} 
+        WHERE id = #{id}
+	</update>
+	
+	
+	<select id="count" parameterType="com.sumin.spring.dto.UserDto" resultType="int">
+        SELECT count(*)
+        FROM user
+	</select>
+</mapper>

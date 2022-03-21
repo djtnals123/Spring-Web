@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sumin.spring.mapper.BoardMapper">
+	<sql id="searchOption">
+		<if test="keyword != null">
+			<choose> 
+				<when test='option == "title"'> 
+					WHERE title LIKE CONCAT('%',#{keyword},'%')
+				</when> 
+				<when test='option == "content"'> 
+					WHERE content LIKE CONCAT('%',#{keyword},'%')
+				</when> 
+				<when test='option == "title+content"'> 
+					WHERE content LIKE CONCAT('%',#{keyword},'%') OR title LIKE CONCAT('%',#{keyword},'%')
+				</when>
+				<when test='option == "writer"'> 
+					WHERE writer LIKE CONCAT('%',#{keyword},'%') 
+				</when> 			
+			</choose>
+		</if>
+	</sql> 
+	
+	<select id="selectList" parameterType="com.sumin.spring.dto.Criteria" resultType="com.sumin.spring.dto.BoardDto">
+		SELECT board_id, title, writer, created_date
+		FROM board
+		<include refid="searchOption"/>
+		ORDER BY board_id DESC
+		LIMIT #{pageStart}, #{perPage}
+	</select>
+	
+	<select id="count" parameterType="com.sumin.spring.dto.Criteria" resultType="int">
+        SELECT count(*)
+        FROM board
+        <include refid="searchOption"/>
+	</select>
+	
+	<select id="selectOne" resultType="com.sumin.spring.dto.BoardDto">
+		SELECT board_id, title, writer, content
+		FROM board
+		WHERE board_id = #{boardID} 
+	</select>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="boardID" keyColumn="board_id" parameterType="com.sumin.spring.dto.BoardDto">
+		INSERT INTO 
+		board (title, writer, content) 
+		VALUES (#{title}, #{writer}, #{content})
+	</insert>
+	
+	<delete id="delete">
+		DELETE FROM board
+		WHERE board_id = #{value}
+	</delete>
+	
+	<update id="update" parameterType="com.sumin.spring.dto.BoardDto">
+        UPDATE board
+        SET title = #{title}, 
+        	content = #{content}
+        WHERE board_id = #{boardID}
+	</update>
+</mapper>

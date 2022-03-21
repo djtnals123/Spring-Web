@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	<security:http pattern="/css/**" security="none" />
+	<security:http pattern="/font/**" security="none" />
+	<security:http pattern="/img/**" security="none" />
+	<security:http pattern="/js/**" security="none" />
+	
+	
+	<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+	
+	<context:component-scan base-package="com.sumin.spring" />
+	<bean id="customUserService" class="com.sumin.spring.service.impl.CustomUserDetailsServiceImpl" />
+	
+	<security:http>
+		<security:intercept-url pattern="/" access="permitAll"/>
+		<security:intercept-url pattern="/test/member" access="hasRole('ROLE_MEMBER')"/>
+		<security:intercept-url pattern="/test/admin" access="hasRole('ROLE_ADMIN')"/>
+		<security:intercept-url pattern="/admintest/**" access="hasRole('ROLE_ADMIN')"/>
+		<security:form-login login-page="/login"
+							 username-parameter="id"
+							 login-processing-url="/login-processing"
+							 default-target-url="/choose_function" />
+		
+		
+		<!-- 최대 한 개의 세션만 생성되도록 -->
+		<security:session-management invalid-session-url="/login">
+            <security:concurrency-control max-sessions="1"
+            							  expired-url="/login"
+            							  error-if-maximum-exceeded="true" />
+        </security:session-management>
+	</security:http>
+	
+	<security:authentication-manager>	
+	  <security:authentication-provider user-service-ref="customUserService">
+	  	<security:password-encoder hash="bcrypt"/>
+	  </security:authentication-provider>
+	</security:authentication-manager>
+
+</beans>
